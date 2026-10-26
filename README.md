@@ -38,4 +38,4 @@ Then open http://localhost:5000 in your browser, upload the dataset CSV, and tra
 ![Use case diagram](Images/Use%20case.png)
 
 ## My role
-This was a group project (4 members). I prepared the project report and the presentation, and worked on running and comparing the 4 regression models (Decision Tree, OMP, KNN and Random Forest + Linear Regression). The base code and dataset were provided by our project guide. And data preprocessing, report and presentation.)
+This was a group project (4 members). I prepared the project report and the presentation, and worked on running and comparing the 4 regression models (Decision Tree, OMP, KNN and Random Forest + Linear Regression). The base code and dataset were provided by our project guide.
