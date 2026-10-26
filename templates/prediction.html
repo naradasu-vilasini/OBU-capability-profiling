@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction - Vehicle Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold text-primary">Vehicle Eligibility Prediction</h1>
+            <p class="lead text-muted">Predict eligibility scores for individual vehicles or process batch data</p>
+        </div>
+
+        <div class="row">
+            <!-- Single Prediction -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-car me-2"></i>Single Vehicle Prediction
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if feature_columns %}
+                        <form action="{{ url_for('predict_single') }}" method="POST">
+                            <div class="row">
+                                {% for column in feature_columns %}
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ column }}" class="form-label">{{ column }}</label>
+                                    <input type="number" class="form-control" id="{{ column }}" name="{{ column }}" 
+                                           step="any" required 
+                                           {% if input_data and input_data[column] %}value="{{ input_data[column] }}"{% endif %}
+                                           placeholder="Enter {{ column }} value">
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-magic me-2"></i>Predict Eligibility Score
+                            </button>
+                        </form>
+                        
+                        <!-- Single Prediction Result -->
+                        {% if single_prediction %}
+                        <div class="alert alert-success mt-4">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-check-circle me-2"></i>Prediction Result
+                            </h6>
+                            <div class="bg-white p-3 rounded border">
+                                <h4 class="text-center text-primary">
+                                    Predicted Eligibility Score: 
+                                    <span class="badge bg-primary fs-5">{{ "%.6f"|format(single_prediction.prediction) }}</span>
+                                </h4>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Please upload and process a dataset first to enable predictions.
+                            <a href="{{ url_for('index') }}" class="btn btn-sm btn-primary ms-2">Upload Dataset</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Batch Prediction -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-file-csv me-2"></i>Batch Prediction from CSV
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('predict_batch') }}" method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="batch_file" class="form-label">Upload Test CSV File</label>
+                                <input type="file" class="form-control" id="batch_file" name="batch_file" accept=".csv" required>
+                                <div class="form-text">Upload a CSV file with the same columns as the training data (without Eligible column)</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-upload me-2"></i>Process Batch Predictions
+                            </button>
+                        </form>
+                        
+                        <!-- Download Results -->
+                        {% if batch_file %}
+                        <div class="alert alert-info mt-3">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-file-download me-2"></i>Results Ready
+                            </h6>
+                            <p>Batch predictions completed for: <strong>{{ batch_file }}</strong></p>
+                            <a href="{{ url_for('download_predictions') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-download me-2"></i>Download Results CSV
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Sample Input Format -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Expected CSV Format
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="small mb-2">Your CSV file should have these columns:</p>
+                        {% if feature_columns %}
+                        <code class="small">{{ feature_columns | join(', ') }}</code>
+                        {% else %}
+                        <code class="small">Vehicle, RAM, storage, Trustfactor, Distance, TransmissionRate</code>
+                        {% endif %}
+                        
+                        <p class="small mt-2 mb-0 text-muted">
+                            <i class="fas fa-lightbulb me-1"></i>
+                            The system will automatically predict eligibility scores for all rows in your CSV file.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Prediction Results -->
+        {% if batch_predictions %}
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-table me-2"></i>Batch Prediction Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    {{ batch_predictions | safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Navigation Actions -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg w-100">
+                    <i class="fas fa-home me-2"></i>Back to Home
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('eda') }}" class="btn btn-outline-info btn-lg w-100">
+                    <i class="fas fa-chart-bar me-2"></i>View EDA
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('performance') }}" class="btn btn-outline-warning btn-lg w-100">
+                    <i class="fas fa-chart-line me-2"></i>Model Performance
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

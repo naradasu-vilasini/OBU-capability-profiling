@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Hero Section -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">Vehicle Eligibility Prediction System</h1>
+            <p class="lead text-muted">Upload your dataset to analyze vehicle capability and predict eligibility scores using advanced machine learning algorithms.</p>
+        </div>
+
+        <!-- Dataset Upload Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-upload me-2"></i>Upload Dataset
+                </h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('upload_dataset') }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="dataset" class="form-label">Select CSV Dataset</label>
+                        <input type="file" class="form-control" id="dataset" name="dataset" accept=".csv" required>
+                        <div class="form-text">Please upload a CSV file with vehicle capability data including columns: Vehicle, RAM, storage, Trustfactor, Distance, TransmissionRate, Eligible</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>Upload and Process Dataset
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Model Training Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cogs me-2"></i>Train Machine Learning Models
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Select the regression algorithms to train on your dataset:</p>
+                
+                <form action="{{ url_for('train_models') }}" method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="models" value="decision_tree" id="decision_tree">
+                                <label class="form-check-label" for="decision_tree">
+                                    <strong>Decision Tree Regressor</strong>
+                                    <small class="text-muted d-block">Tree-based regression with max_depth=1</small>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="models" value="omp" id="omp">
+                                <label class="form-check-label" for="omp">
+                                    <strong>Orthogonal Matching Pursuit</strong>
+                                    <small class="text-muted d-block">Linear model with feature selection</small>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="models" value="knn" id="knn">
+                                <label class="form-check-label" for="knn">
+                                    <strong>KNN Regressor</strong>
+                                    <small class="text-muted d-block">K-Nearest Neighbors with k=5</small>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="models" value="random_forest_linear" id="random_forest_linear" checked>
+                                <label class="form-check-label" for="random_forest_linear">
+                                    <strong>Random Forest + Linear Regressor</strong>
+                                    <small class="text-muted d-block">Ensemble voting regressor (Recommended)</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success mt-3">
+                        <i class="fas fa-play me-2"></i>Train Selected Models
+                    </button>
+                </form>
+                
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> Models will be saved to the models folder. If models already exist, they will be loaded automatically.
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-chart-bar fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Exploratory Data Analysis</h5>
+                        <p class="card-text text-muted">Visualize data patterns and correlations</p>
+                        <a href="{{ url_for('eda') }}" class="btn btn-info">View EDA</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-chart-line fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Model Performance</h5>
+                        <p class="card-text text-muted">Compare model metrics and accuracy</p>
+                        <a href="{{ url_for('performance') }}" class="btn btn-warning">View Performance</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-magic fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Make Predictions</h5>
+                        <p class="card-text text-muted">Predict eligibility for new vehicles</p>
+                        <a href="{{ url_for('prediction') }}" class="btn btn-success">Start Predicting</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

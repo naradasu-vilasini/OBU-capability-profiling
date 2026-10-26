@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Model Performance - Vehicle Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold text-primary">Model Performance Comparison</h1>
+            <p class="lead text-muted">Comprehensive evaluation of regression models for vehicle eligibility prediction</p>
+        </div>
+
+        <!-- Performance Metrics Table -->
+        {% if comparison_data %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-table me-2"></i>Performance Metrics Comparison
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Model</th>
+                                <th>MAE</th>
+                                <th>MSE</th>
+                                <th>RMSE</th>
+                                <th>R² Score</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in comparison_data %}
+                            <tr>
+                                <td><strong>{{ row['Model'] }}</strong></td>
+                                <td>{{ "%.4f"|format(row['MAE']) }}</td>
+                                <td>{{ "%.4f"|format(row['MSE']) }}</td>
+                                <td>{{ "%.4f"|format(row['RMSE']) }}</td>
+                                <td>{{ "%.4f"|format(row['R2 Score']) }}</td>
+                                <td>
+                                    {% if row['R2 Score'] >= 0.8 %}
+                                        <span class="badge bg-success">Excellent</span>
+                                    {% elif row['R2 Score'] >= 0.6 %}
+                                        <span class="badge bg-warning">Good</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Fair</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <h6 class="fw-bold">
+                        <i class="fas fa-info-circle me-2"></i>Metric Explanations
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li><strong>MAE:</strong> Mean Absolute Error (lower is better)</li>
+                                <li><strong>MSE:</strong> Mean Squared Error (lower is better)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li><strong>RMSE:</strong> Root Mean Squared Error (lower is better)</li>
+                                <li><strong>R² Score:</strong> Coefficient of determination (higher is better, max = 1.0)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Performance Visualization Plots -->
+        {% if plot_paths %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-scatter me-2"></i>Actual vs Predicted Plots
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">These scatter plots show how well each model predicts actual values. Points closer to the red diagonal line indicate better predictions.</p>
+                
+                <div class="row">
+                    {% for plot_path in plot_paths %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <img src="{{ url_for('results', filename=plot_path) }}" class="img-fluid rounded shadow" alt="Model Performance Plot" style="max-width: 100%; height: auto;">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- No Data State -->
+        {% if not comparison_data and not plot_paths %}
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h5>No Performance Data Available</h5>
+                    <p>Please upload a dataset and train models first to view performance metrics.</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">Upload Dataset & Train Models</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Model Recommendations -->
+        {% if comparison_data %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-thumbs-up me-2"></i>Model Recommendations
+                </h5>
+            </div>
+            <div class="card-body">
+                {% set best_model = comparison_data | sort(attribute='R2 Score', reverse=True) | first %}
+                <div class="alert alert-success">
+                    <h6 class="fw-bold">
+                        <i class="fas fa-trophy me-2"></i>Best Performing Model: {{ best_model['Model'] }}
+                    </h6>
+                    <p class="mb-0">R² Score: {{ "%.4f"|format(best_model['R2 Score']) }} | MAE: {{ "%.4f"|format(best_model['MAE']) }}</p>
+                </div>
+                
+                <p><strong>Recommendation:</strong> The {{ best_model['Model'] }} shows the best performance for vehicle eligibility prediction. This model is automatically used for predictions on the prediction page.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Navigation Actions -->
+        <div class="row">
+            <div class="col-md-4">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg w-100">
+                    <i class="fas fa-home me-2"></i>Back to Home
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('eda') }}" class="btn btn-outline-info btn-lg w-100">
+                    <i class="fas fa-chart-bar me-2"></i>View EDA
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('prediction') }}" class="btn btn-outline-success btn-lg w-100">
+                    <i class="fas fa-magic me-2"></i>Make Predictions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}EDA - Vehicle Eligibility Prediction System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold text-primary">Exploratory Data Analysis</h1>
+            <p class="lead text-muted">Comprehensive analysis of vehicle capability data patterns and relationships</p>
+        </div>
+
+        <!-- EDA Plots Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-area me-2"></i>Data Visualization Dashboard
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if plot_path %}
+                    <div class="text-center">
+                        <img src="{{ url_for('results', filename=plot_path) }}" class="img-fluid rounded shadow" alt="EDA Plots" style="max-width: 100%; height: auto;">
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="alert alert-light">
+                                <h6 class="fw-bold text-primary">
+                                    <i class="fas fa-chart-bar me-2"></i>Plot Descriptions
+                                </h6>
+                                <ul class="mb-0">
+                                    <li><strong>Eligible Score Distribution:</strong> Shows the spread of eligibility scores across the dataset</li>
+                                    <li><strong>RAM vs Eligibility:</strong> Box plots showing how RAM capacity affects eligibility scores</li>
+                                    <li><strong>Storage vs Eligibility:</strong> Box plots revealing storage capacity impact on eligibility</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-light">
+                                <h6 class="fw-bold text-success">
+                                    <i class="fas fa-chart-line me-2"></i>Relationship Analysis
+                                </h6>
+                                <ul class="mb-0">
+                                    <li><strong>Trustfactor Correlation:</strong> Scatter plot showing trustfactor influence on eligibility</li>
+                                    <li><strong>Transmission Rate Impact:</strong> How transmission rates correlate with eligibility scores</li>
+                                    <li><strong>Feature Correlation Matrix:</strong> Heatmap revealing inter-feature relationships</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                        <h5>No EDA plots available</h5>
+                        <p>Please upload a dataset first to generate exploratory data analysis plots.</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">Upload Dataset</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Navigation Actions -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg w-100">
+                    <i class="fas fa-home me-2"></i>Back to Home
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('performance') }}" class="btn btn-outline-warning btn-lg w-100">
+                    <i class="fas fa-chart-line me-2"></i>Model Performance
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('prediction') }}" class="btn btn-outline-success btn-lg w-100">
+                    <i class="fas fa-magic me-2"></i>Make Predictions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
